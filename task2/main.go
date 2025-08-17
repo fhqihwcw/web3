@@ -80,7 +80,7 @@ func PrintlnOddEven() {
 	go func() {
 		for i := 1; i <= 10; i++ {
 			if i%2 == 1 {
-				fmt.Println("奇数: %v", i)
+				fmt.Println("奇数: ", i)
 			}
 		}
 		wait.Done()
@@ -88,7 +88,7 @@ func PrintlnOddEven() {
 	go func() {
 		for i := 2; i <= 10; i++ {
 			if i%2 == 0 {
-				fmt.Println("偶数: %v", i)
+				fmt.Println("偶数: ", i)
 			}
 		}
 		wait.Done()
@@ -202,9 +202,7 @@ Channel
 *
 */
 func sendMsg() {
-	var c chan int // 声明一个传递整形的通道
-	// 初始化通道
-	c = make(chan int, 10) //  初始化一个 有一个缓冲位的通道
+	var c = make(chan int, 10) //  初始化一个 有一个缓冲位的通道
 
 	go func() {
 		for i := 1; i <= 10; i++ {
