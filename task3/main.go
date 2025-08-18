@@ -23,6 +23,9 @@ func init() {
 }
 
 func main() {
+
+	basicCRUD()
+
 	// accounts1 := models.Accounts{ID: 1, Balance: 0}
 	// accounts2 := models.Accounts{ID: 2, Balance: 0}
 	// DB.Create(accounts1)
@@ -45,11 +48,14 @@ func main() {
 
 	// queriesWithRelations()
 
-	hookstest()
+	// hookstest()
 }
 
-/**
- *SQL语句练习
+/*
+*
+
+	*SQL语句练习
+
 题目1：基本CRUD操作 (题目1.sql目录)
 假设有一个名为 students 的表，包含字段 id （主键，自增）、 name （学生姓名，字符串类型）、 age （学生年龄，整数类型）、 grade （学生年级，字符串类型）。
 要求 ：
@@ -57,7 +63,22 @@ func main() {
 编写SQL语句查询 students 表中所有年龄大于 18 岁的学生信息。
 编写SQL语句将 students 表中姓名为 "张三" 的学生年级更新为 "四年级"。
 编写SQL语句删除 students 表中年龄小于 15 岁的学生记录。
-**/
+*
+*/
+func basicCRUD() {
+	// 插入一条新记录
+	// DB.Exec("INSERT INTO students (name, age, grade) VALUES (?, ?, ?)", "张三", 20, "三年级")
+	DB.Create(&models.Students{Name: "李四", Age: 22, Grade: "三年级"})
+	// 查询所有年龄大于18岁的学生信息
+	students := []models.Students{}
+	DB.Where("age > ?", 18).Find(&students)
+	data, _ := json.Marshal(students)
+	fmt.Println("Students older than 18:", string(data))
+	// 更新姓名为"张三"的学生年级为"四年级"
+	DB.Model(&models.Students{}).Where("name = ?", "张三").Update("grade", "四年级")
+	// 删除年龄小于15岁的学生记录
+	DB.Where("age < ?", 15).Delete(&models.Students{})
+}
 
 /*
 *
