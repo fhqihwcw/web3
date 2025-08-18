@@ -6,12 +6,14 @@ import (
 	"strconv"
 
 	"github.com/fhqihwcw/web3/task3/models"
+	"github.com/jmoiron/sqlx"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 var err error
+var dbx *sqlx.DB
 
 func init() {
 	// 连接数据库
@@ -20,11 +22,17 @@ func init() {
 	if err != nil {
 		panic("连接数据库失败")
 	}
+
+	//sqlx 连接数据库
+	dbx, err = sqlx.Connect("mysql", "root:zhaoxj123@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
+	if err != nil {
+		panic("sqlx连接数据库失败")
+	}
 }
 
 func main() {
 
-	basicCRUD()
+	// basicCRUD()
 
 	// accounts1 := models.Accounts{ID: 1, Balance: 0}
 	// accounts2 := models.Accounts{ID: 2, Balance: 0}
@@ -42,7 +50,8 @@ func main() {
 	// 	DB.Create(&employee)
 	// }
 
-	// queries()
+	queries()
+	queriesBooks()
 
 	// createModels()
 
@@ -154,20 +163,14 @@ Sqlx入门
 func queries() {
 	// 查询所有技术部员工
 	employees := []models.Employees{}
-	err := DB.Where("department = ?", "技术部").Find(&employees).Error
-	if err != nil {
-		panic(err)
-	}
+	dbx.Select(&employees, "SELECT * FROM employees WHERE department = ?", "技术部")
 	// 打印查询结果
 	for _, employee := range employees {
 		println("ID:", employee.ID, "Name:", employee.Name, "Department:", employee.Department, "Salary:", employee.Salary)
 	}
 	// 查询工资最高的员工
 	highestSalaryEmployee := models.Employees{}
-	err = DB.Order("salary desc").First(&highestSalaryEmployee).Error
-	if err != nil {
-		panic(err)
-	}
+	dbx.Get(&highestSalaryEmployee, "SELECT * FROM employees ORDER BY salary DESC LIMIT 1")
 	println("ID:", highestSalaryEmployee.ID, "Name:", highestSalaryEmployee.Name, "Department:", highestSalaryEmployee.Department, "Salary:", highestSalaryEmployee.Salary)
 }
 
@@ -182,10 +185,8 @@ func queries() {
 func queriesBooks() {
 	// 查询价格大于50元的书籍
 	books := []models.Book{}
-	err := DB.Where("price > ?", 50).Find(&books).Error
-	if err != nil {
-		panic(err)
-	}
+	dbx.Select(&books, "SELECT * FROM books WHERE price > ?", 50)
+
 	// 打印查询结果
 	for _, book := range books {
 		println("ID:", book.ID, "Title:", book.Title, "Author:", book.Author, "Price:", strconv.FormatFloat(book.Price, 'f', 2, 64))
